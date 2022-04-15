@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/consul-k8s/control-plane/subcommand/flags"
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-multierror"
+	vaultapi "github.com/hashicorp/vault/api"
 	"github.com/mitchellh/cli"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -237,6 +238,13 @@ func (c *Command) reconcileCertificates(ctx context.Context, clientset kubernete
 	}
 
 	certSecret, err := clientset.CoreV1().Secrets(bundle.SecretNamespace).Get(ctx, bundle.SecretName, metav1.GetOptions{})
+	clientConf := &vaultapi.Config{
+		Address: "http://localhost:8200",
+	}
+	// err = clientConf.ConfigureTLS(vaultTLSConfig(config))
+
+	vaultClient, err := vaultapi.NewClient(clientConf)
+	secret, _ := vaultClient.Logical().Read("/foo/bar")
 	if err != nil && k8serrors.IsNotFound(err) {
 		secret := &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
