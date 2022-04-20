@@ -662,6 +662,10 @@ server:
   # the disk size of the attached volume.
   storage: 10Gi
 
+  # for small kubernetes cluster or for test
+  # if persisted is false, will use empty dir for data
+  persisted: true
+
   # The StorageClass to use for the servers' StatefulSet storage. It must be
   # able to be dynamically provisioned if you want the storage
   # to be automatically created. For example, to use local

@@ -127,6 +127,10 @@ spec:
         {{- toYaml .Values.server.securityContext | nindent 8 }}
       {{- end }}
       volumes:
+        {{- if not .Values.server.persisted }}
+        - name: data-{{ .Release.Namespace | trunc 58 | trimSuffix "-" }}
+          emptyDir: {}
+        {{- end }}
         - name: config
           configMap:
             name: {{ template "consul.fullname" . }}-server-config
@@ -409,6 +413,7 @@ spec:
       nodeSelector:
         {{ tpl .Values.server.nodeSelector . | indent 8 | trim }}
       {{- end }}
+  {{- if .Values.server.persisted }}
   volumeClaimTemplates:
     - metadata:
         name: data-{{ .Release.Namespace | trunc 58 | trimSuffix "-" }}
@@ -421,4 +426,5 @@ spec:
         {{- if .Values.server.storageClass }}
         storageClassName: {{ .Values.server.storageClass }}
         {{- end }}
+  {{- end }}
 {{- end }}
